@@ -60,6 +60,8 @@
     <Compile Include="Main.cs" />
     <Compile Include="StreamObservable.cs" />
     <Compile Include="DynamicJson.cs" />
+    <Compile Include="AILogic.cs" />
+    <Compile Include="InternalTypes.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

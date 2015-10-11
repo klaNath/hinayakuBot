@@ -20,18 +20,17 @@ using System.Security.Cryptography;
 using System.Reactive.PlatformServices;
 using System.Diagnostics;
 using System.Runtime.ExceptionServices;
-
 namespace hinayakuBotV2
 {
-	public class StreamObservable : MainClass
+	public class AILogic : MainClass
 	{
-		public async Task Stream(){
-			
-		}
+		public static readonly string NagaokaID = "150020";
+		public static readonly string KanagawaID = "130010";
+		public static readonly string WeatherUrl = "http://weather.livedoor.com/forecast/webservice/json/v1?city=";
+		public static readonly string NO_VALUE = "---";
 
-		public CoreTweet.Tokens TokenCreate(TwitterID IDs)
-		{
-			return CoreTweet.Tokens.Create (IDs?.APIKey, IDs?.APISecret, IDs?.AccessToken, IDs?.AccessTokenSecret);
+		public async Task AI(){
+			
 		}
 	}
 }
