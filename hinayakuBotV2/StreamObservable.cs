@@ -23,7 +23,7 @@ using System.Runtime.ExceptionServices;
 
 namespace hinayakuBotV2
 {
-	public class StreamObservable
+	public static class StreamObservable
 	{
 		public static async Task StreamStart(CommandContext C){
 			
@@ -104,7 +104,7 @@ namespace hinayakuBotV2
 				while(RetryFlag != true){
 					
 					context
-						.Where (x => x.Keys.Any (Constant.Cmd))
+						.Where (x => x.Keys.Any (y => y = Constant.Cmd))
 						.Subscribe (x => {
 							if(x[Constant.Cmd] == Constant.CmdReBorn)RetryFlag = true;
 							else if(x[Constant.Cmd] == Constant.CmdEnd){
@@ -121,7 +121,7 @@ namespace hinayakuBotV2
 
 		}
 
-		private static TwitterID GetIdFromXml(){
+		static TwitterID GetIdFromXml(){
 			try{
 				var ser = new System.Xml.Serialization.XmlSerializer(typeof(TwitterID));
 				string path = $"{Directory.GetCurrentDirectory()}{System.IO.Path.DirectorySeparatorChar}TwitterIDs.xml";
@@ -136,7 +136,7 @@ namespace hinayakuBotV2
 			}
 		}
 
-		public static CoreTweet.Tokens TokenCreate(TwitterID IDs)
+		public static Tokens TokenCreate(TwitterID IDs)
 		{
 			try{
 				return CoreTweet.Tokens.Create (IDs?.APIKey, IDs?.APISecret, IDs?.AccessToken, IDs?.AccessTokenSecret);
