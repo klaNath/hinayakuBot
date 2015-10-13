@@ -22,7 +22,7 @@ using System;
 
 namespace hinayakuBotV2
 {
-	public class Constant
+	public static class Constant
 	{
 
 		public static readonly long hinayakuBotUserId = 3088293410;
@@ -38,6 +38,7 @@ namespace hinayakuBotV2
 		public static readonly string CmdTrue = "True";
 		public static readonly string CmdFalse = "False";
 		public static readonly string CmdAck = "Acknowledge";
+		public static readonly string CmdTweet = "Tweet";
 
 
 		public static readonly string TwName = "TwName";

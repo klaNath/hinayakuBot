@@ -104,8 +104,8 @@ namespace hinayakuBotV2
 				while(RetryFlag != true){
 					
 					context
-						.Where (x => x.Keys.Any (y => y = Constant.Cmd))
-						.Subscribe (x => {
+						.Where (x => x.Keys.Any (y => y == Constant.Cmd))
+						.Subscribe (async x => {
 							if(x[Constant.Cmd] == Constant.CmdReBorn)RetryFlag = true;
 							else if(x[Constant.Cmd] == Constant.CmdEnd){
 								C.Command = new Dictionary<string, string>(){{Constant.Cmd,Constant.CmdAck}};
@@ -113,6 +113,10 @@ namespace hinayakuBotV2
 							}
 							else if(x[Constant.Cmd] == Constant.CmdSuicide){
 								stream.Connect().Dispose();
+								await Token.Statuses.UpdateAsync($"Suicide. Bye @{x[Constant.TwName]}",long.Parse(x[Constant.TwId]));
+							}
+							else if(x[Constant.Cmd] == Constant.CmdTweet){
+								await Token.Statuses.UpdateAsync(x[Constant.TwText],long.Parse(x[Constant.TwId]));
 							}
 						});
 				}
