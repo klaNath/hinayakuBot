@@ -29,7 +29,7 @@ namespace hinayakuBotV2
 		public static readonly string WeatherUrl = "http://weather.livedoor.com/forecast/webservice/json/v1?city=";
 		public static readonly string NO_VALUE = "---";
 
-		public async Task AI(){
+		public static async Task AI(CommandContext Command){
 			
 		}
 	}

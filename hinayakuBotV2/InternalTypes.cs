@@ -25,5 +25,13 @@ namespace hinayakuBotV2
 		public string Location { get; set; }
 		public string Description { get; set; }
 	}
+
+	public static class ExtensionMethods
+	{
+		public static void COut(this String s)
+		{
+			Console.WriteLine (s);
+		}
+	}
 }
 
