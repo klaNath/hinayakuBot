@@ -25,7 +25,7 @@ namespace hinayakuBotV2
 {
 	public static class StreamObservable
 	{
-		public static async Task StreamStart(CommandContext C){
+		public static async Task StreamStart(CommandContext C,StatusContext S){
 			
 			var IDs = GetIdFromXml ();
 			if (IDs == null) {
@@ -35,7 +35,7 @@ namespace hinayakuBotV2
 			}
 			bool RetryFlag = false;
 			var context = C.GetCommand;
-
+			var StatusContext = S.GetStatus;
 			var Token = TokenCreate (IDs);
 			C.Command = new Dictionary<string,string> (){ { Constant.Cmd,Constant.CmdStart } };
 
@@ -101,8 +101,11 @@ namespace hinayakuBotV2
 						{
 							Console.WriteLine(DateTime.Now + " : これはOnComplete at Yo");
 						});
+				stream
+					.Where (x => !(x.Status.IsRetweeted.HasValue && x.Status.IsRetweeted.Value))
+					.Subscribe (StatusContext.OnNext);
+				
 				while(RetryFlag != true){
-					
 					context
 						.Where (x => x.Keys.Any (y => y == Constant.Cmd))
 						.Subscribe (async x => {

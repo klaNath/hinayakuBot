@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Reactive.Subjects;
+using CoreTweet.Streaming;
 
 namespace hinayakuBotV2
 {
@@ -15,8 +16,9 @@ namespace hinayakuBotV2
 
 			List<Task> Tasks = new List<Task> ();
 			var CommandContext = new CommandContext ();
-			Tasks.Add(Task.Run(() =>  StreamObservable.StreamStart(CommandContext)));
-			Tasks.Add(Task.Run (() => AILogic.AI (CommandContext)));
+			var StatusContext = new StatusContext ();
+			Tasks.Add(Task.Run(() =>  StreamObservable.StreamStart(CommandContext,StatusContext)));
+			Tasks.Add(Task.Run (() => AILogic.AI (CommandContext,StatusContext)));
 			System.Threading.Thread.Yield ();
 			Task.WhenAll (Tasks).Wait ();
 
@@ -39,6 +41,25 @@ namespace hinayakuBotV2
 		}
 
 		public CommandContext()
+		{
+		}
+
+	}
+	public partial class StatusContext
+	{
+
+		private Subject<StatusMessage> _Status = new Subject<StatusMessage>();
+		public StatusMessage Status
+		{
+			set { _Status.OnNext (value);}
+		}
+
+		public Subject<StatusMessage> GetStatus
+		{
+			get { return _Status;}
+		}
+
+		public StatusContext()
 		{
 		}
 
