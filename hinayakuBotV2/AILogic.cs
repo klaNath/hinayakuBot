@@ -30,6 +30,35 @@ namespace hinayakuBotV2
 		public static readonly string NO_VALUE = "---";
 
 		public static async Task AI(CommandContext C, StatusContext S){
+
+			var stream = S.GetStatus.Publish();
+			var context = C.GetCommand;
+
+			stream
+				.Where(y => y.Status.Text.Contains("Yo")
+					&& y.Status.Text.Contains("hinayakuBot"))
+				.Select(x => new{Text = x.Status.Text,Id = x.Status.Id, Name = x.Status.User.ScreenName})
+				.Subscribe(x => 
+					{
+						var dict = new Dictionary<string,string>()
+						{
+							{Constant.TwText,"@{x.Name} Yo"},
+							{Constant.TwId,x.Id.ToString()}
+						};
+						context.OnNext(dict);
+					},
+					z => 
+					{
+						Console.WriteLine(z.Message);
+					},
+					() => 
+					{
+						Console.WriteLine(DateTime.Now + " : これはOnComplete at Yo");
+					});
+
+			while(true){
+				
+			}
 			
 		}
 	}
