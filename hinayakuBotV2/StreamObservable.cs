@@ -1,4 +1,25 @@
-﻿using System;
+﻿//
+//  WeatherTweet.cs
+//
+//  Author:
+//       kazusa Okuda <kazusa@klamath.jp>
+//
+//  Copyright (c) 2015 kazusa Okuda
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+using System;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -75,32 +96,9 @@ namespace hinayakuBotV2
 					.Subscribe (x => Console.WriteLine(x.Message),z => Console.WriteLine(z.Message));
 
 
-				stream
-					.Where(x => !(x.Status.IsRetweeted.HasValue && x.Status.IsRetweeted.Value) )
-					.Select (x => new TwString{Name = x.Status.User.ScreenName, Text = x.Status.Text, Id = x.Status.Id})
-					.Subscribe(x => 
-						{
-							Console.WriteLine(x.Name + "/n" + x.Text + "/n");
-						},
-						(Exception y) => Console.WriteLine(y.Message),
-						() => 
-						{
-							Console.WriteLine(DateTime.Now + " : これはOnComplete at Stream");
-						});
 
-				stream
-					.Where(y => y.Status.Text.Contains("Yo")
-						&& y.Status.Text.Contains("hinayakuBot"))
-					.Select(x => new{Text = x.Status.Text,Id = x.Status.Id, Name = x.Status.User.ScreenName})
-					.Subscribe(x => Token.Statuses.Update($"@{x.Name} Yo",x.Id ),
-						z => 
-						{
-							Console.WriteLine(z.Message);
-						},
-						() => 
-						{
-							Console.WriteLine(DateTime.Now + " : これはOnComplete at Yo");
-						});
+
+
 				stream
 					.Where (x => !(x.Status.IsRetweeted.HasValue && x.Status.IsRetweeted.Value))
 					.Subscribe (StatusContext.OnNext);
