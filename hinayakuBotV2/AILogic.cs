@@ -90,6 +90,23 @@ namespace hinayakuBotV2
 						Console.WriteLine(DateTime.Now + " : これはOnComplete at Stream");
 					});
 
+			stream
+				.Where (x => x.Status.Text.Contains ("天気")
+					|| x.Status.Text.Contains ("気温")
+					|| x.Status.Text.Contains ("温度")
+					|| x.Status.Text.Contains ("予報"))
+				.Select (x => new TwString{Name = x.Status.User.ScreenName, Text = x.Status.Text, Id = x.Status.Id})
+				.Subscribe(x => WeatherTweet.WeatherHinayakuAsync(x)
+					.ContinueWith(y => context.OnNext(y.Result))
+					,z => 
+					{
+						Console.WriteLine(z.Message);
+					},
+					() => 
+					{
+						Console.WriteLine("これはOnComplete at tenki");
+					});
+
 
 			stream.OfType<Error> ()
 				.Subscribe (x => Console.WriteLine(x.Message),z => Console.WriteLine(z.Message));

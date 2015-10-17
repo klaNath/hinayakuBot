@@ -32,14 +32,14 @@ namespace hinayakuBotV2
 		public string AccessTokenSecret{ get; set; }
 	}
 
-	class TwString{
+	public class TwString{
 		public string Name{ get; set; }
 		public string Text{ get; set; }	
 		public long Id{ get; set; }
 		public Dictionary<string,string> Parameters{ get; set; }
 	}
 
-	class BotStatus
+	public class BotStatus
 	{
 		public string Name{ get; set; }
 		public string Url{ get; set; }

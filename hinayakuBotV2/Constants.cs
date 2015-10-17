@@ -45,10 +45,6 @@ namespace hinayakuBotV2
 		public static readonly string TwText = "TwText";
 		public static readonly string TwId = "TwId";
 
-		public static readonly string NagaokaID = "150020";
-		public static readonly string KanagawaID = "130010";
-		public static readonly string WeatherUrl = "http://weather.livedoor.com/forecast/webservice/json/v1?city=";
-		public static readonly string NO_VALUE = "---";
 	}
 }
 
