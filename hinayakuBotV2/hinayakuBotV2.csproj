@@ -69,6 +69,7 @@
     <Compile Include="AILogic.cs" />
     <Compile Include="InternalTypes.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="WeatherTweet.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

@@ -56,6 +56,23 @@ namespace hinayakuBotV2
 						Console.WriteLine(DateTime.Now + " : これはOnComplete at Yo");
 					});
 
+			stream
+				.Where(x => !(x.Status.IsRetweeted.HasValue && x.Status.IsRetweeted.Value) )
+				.Select (x => new TwString{Name = x.Status.User.ScreenName, Text = x.Status.Text, Id = x.Status.Id})
+				.Subscribe(x => 
+					{
+						Console.WriteLine(x.Name + "¥n" + x.Text + "¥n");
+					},
+					(Exception y) => Console.WriteLine(y.Message),
+					() => 
+					{
+						Console.WriteLine(DateTime.Now + " : これはOnComplete at Stream");
+					});
+
+
+			stream.OfType<Error> ()
+				.Subscribe (x => Console.WriteLine(x.Message),z => Console.WriteLine(z.Message));
+
 			while(true){
 				
 			}
