@@ -112,7 +112,6 @@ namespace hinayakuBotV2
 				.Subscribe (x => Console.WriteLine(x.Message),z => Console.WriteLine(z.Message));
 
 			while(true){
-				
 			}
 			
 		}
