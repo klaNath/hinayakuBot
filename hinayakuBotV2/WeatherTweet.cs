@@ -94,7 +94,11 @@ namespace hinayakuBotV2
 					title
 				));
 
-				return new Dictionary<string,string>(){{Constant.TwText,text}};
+				return new Dictionary<string,string>(){
+					{Constant.TwText,text},
+					{Constant.TwId,x.Id.ToString()},
+					{Constant.Cmd, Constant.CmdTweet}
+				};
 			}
 		}
 	}
