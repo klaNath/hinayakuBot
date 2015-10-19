@@ -97,7 +97,7 @@ namespace hinayakuBotV2
 
 				stream
 					.Where (x => !(x.Status.IsRetweeted.HasValue && x.Status.IsRetweeted.Value))
-					.Subscribe (StatusContext.OnNext);
+					.Subscribe (x => StatusContext.OnNext(x));
 
 				var ApiLimit = await Token.Application.RateLimitStatusAsync ();
 				foreach(var rateLimit in ApiLimit["statuses"])
@@ -114,11 +114,11 @@ namespace hinayakuBotV2
 						.Subscribe (async x => {
 							if(x[Constant.Cmd] == Constant.CmdReBorn)RetryFlag = true;
 							else if(x[Constant.Cmd] == Constant.CmdEnd){
-								C.Command = new Dictionary<string, string>(){{Constant.Cmd,Constant.CmdAck}};
+								//C.Command = new Dictionary<string, string>(){{Constant.Cmd,Constant.CmdAck}};
 								await SayonaraHinayakuAsync(Token);
 								return;
 							}
-							else if(x[Constant.Cmd] == Constant.CmdStop){
+							else if(x[Constant.Cmd] == Constant.CmdSuicide){
 								stream.Connect().Dispose();
 								await Token.Statuses.UpdateAsync($"Stop By @{x[Constant.TwName]}",long.Parse(x[Constant.TwId]));
 							}
