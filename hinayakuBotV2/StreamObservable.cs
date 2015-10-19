@@ -71,7 +71,7 @@ namespace hinayakuBotV2
 			};
 
 			try{
-				var latesthinayaku = Token.Statuses.UserTimeline(Constant.hinayakuBotUserId,10);
+				var latesthinayaku = Token.Statuses.UserTimeline(Constant.hinayakuUserId,10);
 				Console.WriteLine(latesthinayaku.First().Text);
 				await Token.Statuses.UpdateAsync(".@hinayaku おはようひなやく",latesthinayaku.First().Id);
 			}
@@ -89,7 +89,7 @@ namespace hinayakuBotV2
 						Console.WriteLine(e.Message);
 						e.StackTrace?.COut();
 						return Observable.Never<StatusMessage>();
-					})					
+					})
 					.Publish();
 
 				stream.OfType<Error> ()
@@ -108,24 +108,26 @@ namespace hinayakuBotV2
 					Console.WriteLine("---------");
 				}
 
+				context
+					.Where (x => x.Keys.Any (y => y == Constant.Cmd))
+					.Subscribe (async x => {
+						if(x[Constant.Cmd] == Constant.CmdReBorn)RetryFlag = true;
+						else if(x[Constant.Cmd] == Constant.CmdEnd){
+							//C.Command = new Dictionary<string, string>(){{Constant.Cmd,Constant.CmdAck}};
+							await SayonaraHinayakuAsync(Token);
+							return;
+						}
+						else if(x[Constant.Cmd] == Constant.CmdSuicide){
+							stream.Connect().Dispose();
+							await Token.Statuses.UpdateAsync($"Stop By @{x[Constant.TwName]}",long.Parse(x[Constant.TwId]));
+						}
+						else if(x[Constant.Cmd] == Constant.CmdTweet){
+							await Token.Statuses.UpdateAsync(x[Constant.TwText],long.Parse(x[Constant.TwId]));
+						}
+					});
+				
 				while(RetryFlag != true){
-					context
-						.Where (x => x.Keys.Any (y => y == Constant.Cmd))
-						.Subscribe (async x => {
-							if(x[Constant.Cmd] == Constant.CmdReBorn)RetryFlag = true;
-							else if(x[Constant.Cmd] == Constant.CmdEnd){
-								//C.Command = new Dictionary<string, string>(){{Constant.Cmd,Constant.CmdAck}};
-								await SayonaraHinayakuAsync(Token);
-								return;
-							}
-							else if(x[Constant.Cmd] == Constant.CmdSuicide){
-								stream.Connect().Dispose();
-								await Token.Statuses.UpdateAsync($"Stop By @{x[Constant.TwName]}",long.Parse(x[Constant.TwId]));
-							}
-							else if(x[Constant.Cmd] == Constant.CmdTweet){
-								await Token.Statuses.UpdateAsync(x[Constant.TwText],long.Parse(x[Constant.TwId]));
-							}
-						});
+
 				}
 			}
 

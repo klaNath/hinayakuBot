@@ -51,6 +51,7 @@ namespace hinayakuBotV2
 			});
 			while(true){
 				if (ShutDownFlag == true){
+					Task.Delay (TimeSpan.FromSeconds (15)).Wait ();
 					cts.Cancel ();
 					break;
 				}
