@@ -23,6 +23,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Reactive.Subjects;
+using System.Reactive;
+using System.Linq;
 using CoreTweet.Streaming;
 
 namespace hinayakuBotV2
@@ -31,19 +33,40 @@ namespace hinayakuBotV2
 	{
 
 
-		public static void Main (string[] args)
+		static void Main (string[] args)
 		{
 			"Wake up, HinayakuBot!".COut ();
-
+			bool ShutDownFlag = false;
 			List<Task> Tasks = new List<Task> ();
 			var CommandContext = new CommandContext ();
 			var StatusContext = new StatusContext ();
-			Tasks.Add(Task.Run(() =>  StreamObservable.StreamStart(CommandContext,StatusContext)));
-			Tasks.Add(Task.Run (() => AILogic.AI (CommandContext,StatusContext)));
+			var cts = new System.Threading.CancellationTokenSource ();
+			Tasks.Add(Task.Run(() =>  StreamObservable.StreamStart(CommandContext,StatusContext),cts.Token));
+			Tasks.Add(Task.Run (() => AILogic.AI (CommandContext,StatusContext),cts.Token));
+			Tasks.Add (Task.Run (() => UserInterface (CommandContext),cts.Token));
 			System.Threading.Thread.Yield ();
-			Task.WhenAll (Tasks).Wait ();
+			Task.WhenAll (Tasks).ContinueWith (x => ShutDownFlag = true);
+			CommandContext.GetCommand.Subscribe (x => {
+				if(x.Keys.Any(y => y == Constant.Cmd)&& x[Constant.Cmd] == Constant.CmdSuicide) ShutDownFlag = true ;
+			});
+			while(true){
+				if (ShutDownFlag == true){
+					cts.Cancel ();
+					break;
+				}
+			}
 
 			"All Done".COut ();
+		}
+
+		static Task UserInterface (CommandContext commandContext)
+		{
+			var context = commandContext;
+			while(true){
+				var key = Console.ReadLine ();
+				if (key.ToUpper () == "Q")
+					context.Command = new Dictionary<string, string>{ { Constant.Cmd,Constant.CmdSuicide } };
+			}
 		}
 	}
 
