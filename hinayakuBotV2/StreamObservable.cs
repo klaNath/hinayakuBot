@@ -85,17 +85,6 @@ namespace hinayakuBotV2
 					.Timeout(TimeSpan.FromMinutes(30))
 					.Where(x => !x.Status.User.ScreenName.Contains(@"hinayakuBot"))
 					.Retry(5)
-					.Catch((Exception e) => {
-						Console.WriteLine(e.Message);
-						e.StackTrace?.COut();
-						return Observable.Never<StatusMessage>();
-					})
-					.Publish();
-
-				stream.OfType<Error> ()
-					.Subscribe (x => Console.WriteLine(x.Message),z => Console.WriteLine(z.Message));
-
-				stream
 					.Where (x => !(x.Status.IsRetweeted.HasValue && x.Status.IsRetweeted.Value))
 					.Subscribe (x => StatusContext.OnNext(x));
 
@@ -118,7 +107,6 @@ namespace hinayakuBotV2
 							return;
 						}
 						else if(x[Constant.Cmd] == Constant.CmdSuicide){
-							stream.Connect().Dispose();
 							await Token.Statuses.UpdateAsync($"Stop By @{x[Constant.TwName]}",long.Parse(x[Constant.TwId]));
 						}
 						else if(x[Constant.Cmd] == Constant.CmdTweet){
