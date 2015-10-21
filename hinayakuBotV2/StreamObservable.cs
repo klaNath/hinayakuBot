@@ -80,11 +80,19 @@ namespace hinayakuBotV2
 			}
 			while(true){
 				RetryFlag = false;
-				var stream = Token.Streaming.UserAsObservable()
+				var stream = Token.Streaming.UserAsObservable ()
+					.OfType<StatusMessage> ()
+					.Timeout (TimeSpan.FromMinutes (30))
+					.Where (x => !x.Status.User.ScreenName.Contains (@"hinayakuBot"))
+					.Retry (5)
+					.Publish ();
+
+				stream
 					.OfType<StatusMessage>()
-					.Timeout(TimeSpan.FromMinutes(30))
-					.Where(x => !x.Status.User.ScreenName.Contains(@"hinayakuBot"))
-					.Retry(5)
+					.Where (x => !(x.Status.IsRetweeted.HasValue && x.Status.IsRetweeted.Value))
+					.Subscribe (x => x.Status.Text.COut ());
+
+				stream
 					.Where (x => !(x.Status.IsRetweeted.HasValue && x.Status.IsRetweeted.Value))
 					.Subscribe (x => StatusContext.OnNext(x));
 
