@@ -44,7 +44,7 @@ using System.Runtime.ExceptionServices;
 
 namespace hinayakuBotV2
 {
-	public static class StreamObservable
+	public class StreamObservable
 	{
 		public static async Task StreamStart(CommandContext C,StatusContext S){
 			
@@ -89,12 +89,13 @@ namespace hinayakuBotV2
 
 				stream
 					.OfType<StatusMessage>()
-					.Where (x => !(x.Status.IsRetweeted.HasValue && x.Status.IsRetweeted.Value))
-					.Subscribe (x => x.Status.Text.COut ());
+					.Select (x => new TwString{Name = x.Status.User.ScreenName, Text = x.Status.Text, Id = x.Status.Id})
+					.Subscribe (x => Console.WriteLine(x.Text));
 
-				stream
-					.Where (x => !(x.Status.IsRetweeted.HasValue && x.Status.IsRetweeted.Value))
-					.Subscribe (x => StatusContext.OnNext(x));
+//				stream
+//					.Where (x => !(x.Status.IsRetweeted.HasValue && x.Status.IsRetweeted.Value))
+//					.Select (x => new TwString{Name = x.Status.User.ScreenName, Text = x.Status.Text, Id = x.Status.Id})
+//					.Subscribe (x => StatusContext.OnNext(x));
 
 				var ApiLimit = await Token.Application.RateLimitStatusAsync ();
 				foreach(var rateLimit in ApiLimit["statuses"])

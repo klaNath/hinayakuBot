@@ -93,13 +93,13 @@ namespace hinayakuBotV2
 	public partial class StatusContext
 	{
 
-		private Subject<StatusMessage> _Status = new Subject<StatusMessage>();
-		public StatusMessage Status
+		private Subject<TwString> _Status = new Subject<TwString>();
+		public TwString Status
 		{
 			set { _Status.OnNext (value);}
 		}
 
-		public Subject<StatusMessage> GetStatus
+		public Subject<TwString> GetStatus
 		{
 			get { return _Status;}
 		}

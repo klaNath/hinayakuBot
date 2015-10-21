@@ -56,9 +56,9 @@ namespace hinayakuBotV2
 			var context = C.GetCommand;
 
 			stream
-				.Where(y => y.Status.Text.Contains("Yo")
-					&& y.Status.Text.Contains("hinayakuBot"))
-				.Select(x => new{Text = x.Status.Text,Id = x.Status.Id, Name = x.Status.User.ScreenName})
+				.Where(y => y.Text.Contains("Yo")
+					&& y.Text.Contains("hinayakuBot"))
+				.Select(x => new{Text = x.Text,Id = x.Id, Name = x.Name})
 				.Subscribe(x => 
 					{
 						var dict = new Dictionary<string,string>()
@@ -78,8 +78,6 @@ namespace hinayakuBotV2
 					});
 
 			stream
-				.Where(x => !(x.Status.IsRetweeted.HasValue && x.Status.IsRetweeted.Value) )
-				.Select (x => new TwString{Name = x.Status.User.ScreenName, Text = x.Status.Text, Id = x.Status.Id})
 				.Subscribe(x => 
 					{
 						Console.WriteLine(x.Name + "¥n" + x.Text + "¥n");
@@ -91,11 +89,10 @@ namespace hinayakuBotV2
 					});
 
 			stream
-				.Where (x => x.Status.Text.Contains ("天気")
-					|| x.Status.Text.Contains ("気温")
-					|| x.Status.Text.Contains ("温度")
-					|| x.Status.Text.Contains ("予報"))
-				.Select (x => new TwString{Name = x.Status.User.ScreenName, Text = x.Status.Text, Id = x.Status.Id})
+				.Where (x => x.Text.Contains ("天気")
+					|| x.Text.Contains ("気温")
+					|| x.Text.Contains ("温度")
+					|| x.Text.Contains ("予報"))
 				.Subscribe(x => WeatherTweet.WeatherHinayakuAsync(x)
 					.ContinueWith(y => context.OnNext(y.Result))
 					,z => 
