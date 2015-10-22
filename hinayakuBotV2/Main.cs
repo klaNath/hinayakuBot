@@ -47,7 +47,8 @@ namespace hinayakuBotV2
 			System.Threading.Thread.Yield ();
 			Task.WhenAll (Tasks).ContinueWith (x => ShutDownFlag = true);
 			CommandContext.GetCommand.Subscribe (x => {
-				if(x.Keys.Any(y => y == Constant.Cmd)&& x[Constant.Cmd] == Constant.CmdEnd) ShutDownFlag = true ;
+				if(x.Keys.Any(y => y == Constant.Cmd)) x[Constant.Cmd].COut();
+				else if(x.Keys.Any(y => y == Constant.Cmd)&& x[Constant.Cmd] == Constant.CmdEnd) ShutDownFlag = true ;
 			});
 			while(true){
 				if (ShutDownFlag == true){

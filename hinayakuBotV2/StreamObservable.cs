@@ -79,53 +79,63 @@ namespace hinayakuBotV2
 				Console.WriteLine (ex.Message);
 			}
 			while(true){
-				RetryFlag = false;
-				var stream = Token.Streaming.UserAsObservable ()
-					.OfType<StatusMessage> ()
-					.Timeout (TimeSpan.FromMinutes (30))
-					.Where (x => !x.Status.User.ScreenName.Contains (@"hinayakuBot"))
-					.Retry (5)
-					.Publish ();
+				try{
+					RetryFlag = false;
+					var stream = Token.Streaming.UserAsObservable ()
+						.OfType<StatusMessage> ()
+						.Timeout (TimeSpan.FromSeconds (30))
+						.Where (x => !x.Status.User.ScreenName.Contains (@"hinayakuBot"))
+						.Retry (5)
+						.Catch((Exception e) => {
+							Console.WriteLine(e.Message);
+							if(e.StackTrace != null) Console.WriteLine(e.StackTrace);
+							return Observable.Never<StatusMessage>();
+						})					
+						.Publish ();
 
-				stream
-					.OfType<StatusMessage>()
-					.Select (x => new TwString{Name = x.Status.User.ScreenName, Text = x.Status.Text, Id = x.Status.Id})
-					.Subscribe (x => Console.WriteLine(x.Text));
+					stream
+						.OfType<StatusMessage>()
+						.Select (x => new TwString{Name = x.Status.User.ScreenName, Text = x.Status.Text, Id = x.Status.Id})
+						.Subscribe (x => Console.WriteLine(x.Text));
 
-//				stream
-//					.Where (x => !(x.Status.IsRetweeted.HasValue && x.Status.IsRetweeted.Value))
-//					.Select (x => new TwString{Name = x.Status.User.ScreenName, Text = x.Status.Text, Id = x.Status.Id})
-//					.Subscribe (x => StatusContext.OnNext(x));
+					//				stream
+					//					.Where (x => !(x.Status.IsRetweeted.HasValue && x.Status.IsRetweeted.Value))
+					//					.Select (x => new TwString{Name = x.Status.User.ScreenName, Text = x.Status.Text, Id = x.Status.Id})
+					//					.Subscribe (x => StatusContext.OnNext(x));
 
-				var ApiLimit = await Token.Application.RateLimitStatusAsync ();
-				foreach(var rateLimit in ApiLimit["statuses"])
-				{
-					Console.WriteLine("{0}: {1} {2}",
-						rateLimit.Key, rateLimit.Value.Remaining, 
-						rateLimit.Value.Limit);
-					Console.WriteLine("---------");
+					var ApiLimit = await Token.Application.RateLimitStatusAsync ();
+					foreach(var rateLimit in ApiLimit["statuses"])
+					{
+						Console.WriteLine("{0}: {1} {2}",
+							rateLimit.Key, rateLimit.Value.Remaining, 
+							rateLimit.Value.Limit);
+						Console.WriteLine("---------");
+					}
+
+					context
+						.Where (x => x.Keys.Any (y => y == Constant.Cmd))
+						.Subscribe (async x => {
+							if(x[Constant.Cmd] == Constant.CmdReBorn)RetryFlag = true;
+							else if(x[Constant.Cmd] == Constant.CmdEnd){
+								//C.Command = new Dictionary<string, string>(){{Constant.Cmd,Constant.CmdAck}};
+								await SayonaraHinayakuAsync(Token);
+								return;
+							}
+							else if(x[Constant.Cmd] == Constant.CmdSuicide){
+								await Token.Statuses.UpdateAsync($"Stop By @{x[Constant.TwName]}",long.Parse(x[Constant.TwId]));
+							}
+							else if(x[Constant.Cmd] == Constant.CmdTweet){
+								await Token.Statuses.UpdateAsync(x[Constant.TwText],long.Parse(x[Constant.TwId]));
+							}
+						});
+
+					while(RetryFlag != true){
+						await Task.Delay (TimeSpan.FromSeconds (1));
+					}
+				}catch(Exception ex){
+					ex.Message.COut ();
 				}
-
-				context
-					.Where (x => x.Keys.Any (y => y == Constant.Cmd))
-					.Subscribe (async x => {
-						if(x[Constant.Cmd] == Constant.CmdReBorn)RetryFlag = true;
-						else if(x[Constant.Cmd] == Constant.CmdEnd){
-							//C.Command = new Dictionary<string, string>(){{Constant.Cmd,Constant.CmdAck}};
-							await SayonaraHinayakuAsync(Token);
-							return;
-						}
-						else if(x[Constant.Cmd] == Constant.CmdSuicide){
-							await Token.Statuses.UpdateAsync($"Stop By @{x[Constant.TwName]}",long.Parse(x[Constant.TwId]));
-						}
-						else if(x[Constant.Cmd] == Constant.CmdTweet){
-							await Token.Statuses.UpdateAsync(x[Constant.TwText],long.Parse(x[Constant.TwId]));
-						}
-					});
 				
-				while(RetryFlag != true){
-
-				}
 			}
 
 
