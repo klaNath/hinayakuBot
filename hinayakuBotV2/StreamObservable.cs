@@ -81,22 +81,21 @@ namespace hinayakuBotV2
 			while(true){
 				try{
 					RetryFlag = false;
-					var stream = Token.Streaming.UserAsObservable ()
-						.OfType<StatusMessage> ()
-						.Timeout (TimeSpan.FromSeconds (30))
-						.Where (x => !x.Status.User.ScreenName.Contains (@"hinayakuBot"))
-						.Retry (5)
-						.Catch((Exception e) => {
-							Console.WriteLine(e.Message);
-							if(e.StackTrace != null) Console.WriteLine(e.StackTrace);
-							return Observable.Never<StatusMessage>();
-						})					
-						.Publish ();
-
-					stream
-						.OfType<StatusMessage>()
-						.Select (x => new TwString{Name = x.Status.User.ScreenName, Text = x.Status.Text, Id = x.Status.Id})
-						.Subscribe (x => Console.WriteLine(x.Text));
+//					var stream = Token.Streaming.UserAsObservable ()
+//						.Timeout (TimeSpan.FromSeconds (30))
+//						.Retry (5)
+//						.Catch((Exception e) => {
+//							Console.WriteLine(e.Message);
+//							if(e.StackTrace != null) Console.WriteLine(e.StackTrace);
+//							return Observable.Never<StatusMessage>();
+//						})					
+//						.Publish ();
+//
+//					stream
+//						.OfType<StatusMessage>()
+//						.Where (x => !x.Status.User.ScreenName.Contains (@"hinayakuBot"))
+//						.Select (x => new TwString{Name = x.Status.User.ScreenName, Text = x.Status.Text, Id = x.Status.Id})
+//						.Subscribe (x => Console.WriteLine(x.Text));
 
 					//				stream
 					//					.Where (x => !(x.Status.IsRetweeted.HasValue && x.Status.IsRetweeted.Value))

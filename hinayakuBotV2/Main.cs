@@ -19,13 +19,20 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Reactive.Subjects;
 using System.Reactive;
 using System.Linq;
+using CoreTweet;
 using CoreTweet.Streaming;
+using CoreTweet.Core;
+using System.IO;
+using System.Reactive.Linq;
+using CoreTweet.Streaming.Reactive;
+
 
 namespace hinayakuBotV2
 {
@@ -50,6 +57,31 @@ namespace hinayakuBotV2
 				if(x.Keys.Any(y => y == Constant.Cmd)) x[Constant.Cmd].COut();
 				else if(x.Keys.Any(y => y == Constant.Cmd)&& x[Constant.Cmd] == Constant.CmdEnd) ShutDownFlag = true ;
 			});
+
+
+			var IDs = GetIdFromXml ();
+			var Token = TokenCreate (IDs);
+
+
+
+
+			var stream = Token.Streaming.UserAsObservable()
+				.Timeout (TimeSpan.FromSeconds (30))
+				.Retry (5)
+				.Catch((Exception e) => {
+					Console.WriteLine(e.Message);
+					if(e.StackTrace != null) Console.WriteLine(e.StackTrace);
+					return Observable.Never<StatusMessage>();
+				})					
+				.Publish ();
+
+			stream
+				.OfType<StatusMessage>()
+				.Where (x => !x.Status.User.ScreenName.Contains (@"hinayakuBot"))
+				.Select (x => new TwString{Name = x.Status.User.ScreenName, Text = x.Status.Text, Id = x.Status.Id})
+				.Subscribe (x => Console.WriteLine(x.Text));
+
+
 			while(true){
 				if (ShutDownFlag == true){
 					Task.Delay (TimeSpan.FromSeconds (15)).Wait ();
@@ -68,6 +100,32 @@ namespace hinayakuBotV2
 				var key = Console.ReadLine ();
 				if (key.ToUpper () == "Q")
 					context.Command = new Dictionary<string, string>{ { Constant.Cmd,Constant.CmdEnd} };
+			}
+		}
+
+		static TwitterID GetIdFromXml(){
+			try{
+				var ser = new System.Xml.Serialization.XmlSerializer(typeof(TwitterID));
+				string path = $"{Directory.GetCurrentDirectory()}{System.IO.Path.DirectorySeparatorChar}TwitterIDs.xml";
+				using (var fs = new System.IO.FileStream (path, FileMode.Open)) 
+				{
+					return (TwitterID)ser.Deserialize (fs);
+				}
+			}
+			catch(Exception ex){
+				Console.WriteLine (ex.Message);
+				return null;
+			}
+		}
+
+		static Tokens TokenCreate(TwitterID IDs)
+		{
+			try{
+				return CoreTweet.Tokens.Create (IDs?.APIKey, IDs?.APISecret, IDs?.AccessToken, IDs?.AccessTokenSecret);
+			}
+			catch(Exception ex){
+				Console.WriteLine (ex.Message);
+				return null;
 			}
 		}
 	}
